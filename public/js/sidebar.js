@@ -1,20 +1,16 @@
 import Sortable from '../vendor/sortable.esm.js';
 import { itemTitleFromText } from './title.js';
 import {
-  getMainOrderedIds,
-  reorderMainList,
-  reorderNavList,
-  persistOrder,
+  syncMainFromNavStructure,
+  persistAllGroupPositions,
   runOrderSync,
-  isOrderSyncing,
   refreshItemNumbers,
 } from './order-sync.js';
 
 const DESKTOP_MQ = '(min-width: 960px)';
 
 let navListEl = null;
-let mainListEl = null;
-let sortableNav = null;
+const navItemSortables = [];
 
 export function createNavItem(item) {
   const li = document.createElement('li');
@@ -39,10 +35,57 @@ export function createNavItem(item) {
   return li;
 }
 
-export function addNavItem(item) {
+function createNavGroupSection(groupId, groupName, items) {
+  const section = document.createElement('li');
+  section.className = 'nav-group';
+  section.dataset.navGroupId = String(groupId);
+
+  const heading = document.createElement('div');
+  heading.className = 'nav-group-heading';
+  heading.textContent = groupName;
+
+  const itemsList = document.createElement('ul');
+  itemsList.className = 'nav-group-items';
+
+  for (const item of items) {
+    itemsList.appendChild(createNavItem(item));
+  }
+
+  section.appendChild(heading);
+  section.appendChild(itemsList);
+  return section;
+}
+
+export function rebuildSidebarNav() {
   if (!navListEl) return;
-  navListEl.appendChild(createNavItem(item));
+  const container = document.getElementById('groups-container');
+  if (!container) return;
+
+  destroyNavSortables();
+  navListEl.innerHTML = '';
+
+  const groupCards = container.querySelectorAll('.group-card[data-group-id]');
+  for (const groupCard of groupCards) {
+    const groupId = groupCard.dataset.groupId;
+    const groupName = groupCard.querySelector('.group-name')?.textContent?.trim() || 'Group';
+    const cards = groupCard.querySelectorAll('.item-card[data-item-id]');
+    const items = [...cards].map((card) => ({
+      id: Number(card.dataset.itemId),
+      text: card.querySelector('.item-text')?.value || '',
+    }));
+    navListEl.appendChild(createNavGroupSection(groupId, groupName, items));
+  }
+
   updateNavEmptyState();
+  refreshItemNumbers(navListEl);
+  initNavSortables();
+}
+
+export function updateNavGroupName(groupId, name) {
+  const heading = navListEl?.querySelector(
+    `.nav-group[data-nav-group-id="${groupId}"] .nav-group-heading`
+  );
+  if (heading) heading.textContent = name;
 }
 
 export function removeNavItem(itemId) {
@@ -63,35 +106,36 @@ function updateNavEmptyState() {
   empty.classList.toggle('hidden', hasItems);
 }
 
-export function syncNavFromMain({ animate = true } = {}) {
-  if (!navListEl || !mainListEl || isOrderSyncing()) return;
-  const ids = getMainOrderedIds(mainListEl);
-  runOrderSync(() => reorderNavList(navListEl, ids, { animate }));
+function destroyNavSortables() {
+  while (navItemSortables.length) {
+    navItemSortables.pop()?.destroy();
+  }
 }
 
-export function initNavSortable() {
-  if (!navListEl || sortableNav) return;
-  sortableNav = Sortable.create(navListEl, {
-    animation: 180,
-    handle: '.nav-drag',
-    draggable: '.nav-item',
-    ghostClass: 'sortable-ghost',
-    onEnd() {
-      if (!mainListEl) return;
-      const ids = [...navListEl.querySelectorAll('.nav-item[data-nav-item-id]')].map((el) =>
-        Number(el.dataset.navItemId)
-      );
-      runOrderSync(() => {
-        reorderMainList(mainListEl, ids, { animate: true });
-        refreshItemNumbers(mainListEl, navListEl);
-        persistOrder(ids);
-      });
-    },
+function initNavSortables() {
+  if (!navListEl) return;
+  destroyNavSortables();
+
+  navListEl.querySelectorAll('.nav-group-items').forEach((listEl) => {
+    const sortable = Sortable.create(listEl, {
+      group: { name: 'kirtan-nav-items', pull: true, put: true },
+      animation: 180,
+      handle: '.nav-drag',
+      draggable: '.nav-item',
+      ghostClass: 'sortable-ghost',
+      onEnd() {
+        runOrderSync(() => {
+          syncMainFromNavStructure();
+          refreshItemNumbers(navListEl);
+          persistAllGroupPositions();
+        });
+      },
+    });
+    navItemSortables.push(sortable);
   });
 }
 
-export function initSidebarLayout({ listEl, navList, sidebar, toggleBtn, backdrop }) {
-  mainListEl = listEl;
+export function initSidebarLayout({ navList, sidebar, toggleBtn, backdrop }) {
   navListEl = navList;
 
   const desktop = window.matchMedia(DESKTOP_MQ);
@@ -112,7 +156,6 @@ export function initSidebarLayout({ listEl, navList, sidebar, toggleBtn, backdro
   });
   backdrop?.addEventListener('click', closeSidebar);
 
-  initNavSortable();
   updateNavEmptyState();
 }
 

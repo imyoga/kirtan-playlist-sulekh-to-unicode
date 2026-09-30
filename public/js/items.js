@@ -76,10 +76,14 @@ function bindItemCard(li, item, { onRemove, isDraft = false, onConfirmDraft, onT
       }
     });
   } else {
-    li.querySelector('[data-copy-unicode]')?.addEventListener('click', () => {
+    li.querySelector('.btn-copy-unicode')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       copyText(textarea.value, 'Unicode copied');
     });
-    li.querySelector('[data-copy-sulekh]')?.addEventListener('click', async () => {
+    li.querySelector('.btn-copy-sulekh')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       try {
         const sulekh = await fetchSulekh(textarea.value);
         copyText(sulekh, 'Sulekh copied');
@@ -87,7 +91,9 @@ function bindItemCard(li, item, { onRemove, isDraft = false, onConfirmDraft, onT
         showToast('Sulekh copy failed', 'danger');
       }
     });
-    li.querySelector('[data-delete]')?.addEventListener('click', async () => {
+    li.querySelector('.btn-delete-item')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       try {
         await deleteItem(item.id);
         li.remove();
@@ -117,9 +123,9 @@ export function buildItemElement(item, hooks = {}) {
       <span class="item-number" aria-hidden="true">0</span>
       <span class="item-title"></span>
       <div class="item-actions">
-        <button type="button" data-copy-unicode" title="Copy Unicode">${iconSvg('copy')}</button>
-        <button type="button" data-copy-sulekh" title="Copy Sulekh">${iconSvg('copy')}</button>
-        <button type="button" data-delete" title="Remove">${iconSvg('trash')}</button>
+        <button type="button" class="btn-copy-unicode" data-action="copy-unicode" title="Copy Unicode" aria-label="Copy Unicode">${iconSvg('copy')}</button>
+        <button type="button" class="btn-copy-sulekh" data-action="copy-sulekh" title="Copy Sulekh" aria-label="Copy Sulekh">${iconSvg('copy')}</button>
+        <button type="button" class="btn-delete-item" data-action="delete" title="Remove" aria-label="Remove">${iconSvg('trash')}</button>
       </div>
     </div>
     <textarea class="item-text" rows="1" spellcheck="false"></textarea>
@@ -129,12 +135,14 @@ export function buildItemElement(item, hooks = {}) {
   return li;
 }
 
-export function buildDraftElement({ onConfirm, onCancel }) {
+export function buildDraftElement({ onConfirm, onCancel, numberLabel = '' }) {
   const li = document.createElement('li');
   li.className = 'item-card is-draft';
+  const num = numberLabel || '—';
   li.innerHTML = `
     <div class="item-top">
-      <span class="item-title">New item</span>
+      <span class="item-number" aria-hidden="true">${num}</span>
+      <span class="item-title">New kirtan</span>
     </div>
     <textarea class="item-text" rows="3" placeholder="Paste Sulekh or Unicode…" spellcheck="false"></textarea>
     <div class="draft-actions">

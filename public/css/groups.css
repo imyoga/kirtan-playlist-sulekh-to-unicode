@@ -1,0 +1,106 @@
+.groups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.group-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+
+.group-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.group-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  cursor: pointer;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group-name:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.group-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-delete-group {
+  opacity: 0.55;
+}
+
+.btn-delete-group:hover {
+  opacity: 1;
+}
+
+.group-card .items-list {
+  padding: 0.5rem 0.65rem 0.65rem;
+}
+
+.add-group-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.add-group-form {
+  display: flex;
+  flex: 1;
+  min-width: 200px;
+  gap: 0.35rem;
+}
+
+.add-group-input {
+  flex: 1;
+  font: inherit;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.btn-add-group-submit {
+  font: inherit;
+  padding: 0.5rem 0.85rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-add-group-submit:hover {
+  background: var(--accent-hover);
+}
+
+.group-sortable-ghost {
+  opacity: 0.45;
+}

@@ -8,6 +8,10 @@ export function showToast(message, type = 'info') {
   setTimeout(() => toast.remove(), 2600);
 }
 
+export async function copyUrlToClipboard(url) {
+  await copyText(url, 'Link copied to clipboard');
+}
+
 export async function copyText(text, successMessage = 'Copied') {
   try {
     await navigator.clipboard.writeText(text);

@@ -1,40 +1,71 @@
-import { savePositions, getSlug } from './api.js';
+import { getSlug } from './api.js';
 import { showToast } from './toast.js';
 
 let syncing = false;
+
+export function getGroupsContainer() {
+  return document.getElementById('groups-container');
+}
 
 export function isOrderSyncing() {
   return syncing;
 }
 
-export function getMainOrderedIds(listEl) {
-  return [...listEl.querySelectorAll('.item-card[data-item-id]')].map((el) =>
+export function getMainOrderedIds() {
+  const container = getGroupsContainer();
+  if (!container) return [];
+  return [...container.querySelectorAll('.item-card[data-item-id]')].map((el) =>
     Number(el.dataset.itemId)
   );
 }
 
-export function refreshItemNumbers(listEl, navListEl) {
-  if (!listEl) return;
-  const ids = getMainOrderedIds(listEl);
-  const total = ids.length;
+/** Label for the next kirtan added in this group's items list (e.g. "2.3"). */
+export function getNextItemLabelForItemsList(itemsListEl) {
+  const container = getGroupsContainer();
+  if (!container || !itemsListEl) return '';
+  const groupCard = itemsListEl.closest('.group-card[data-group-id]');
+  if (!groupCard) return '';
+  const groupCards = [...container.querySelectorAll('.group-card[data-group-id]')];
+  const groupNo = groupCards.indexOf(groupCard) + 1;
+  if (groupNo < 1) return '';
+  const itemCount = itemsListEl.querySelectorAll('.item-card[data-item-id]').length;
+  return `${groupNo}.${itemCount + 1}`;
+}
 
+export function refreshItemNumbers(navListEl) {
+  const container = getGroupsContainer();
+  if (!container) return;
+
+  const groupCards = container.querySelectorAll('.group-card[data-group-id]');
+  const numbered = [];
+  for (const [groupIndex, groupCard] of [...groupCards].entries()) {
+    const groupNo = groupIndex + 1;
+    const itemCards = groupCard.querySelectorAll('.item-card[data-item-id]');
+    for (const [itemIndex, card] of [...itemCards].entries()) {
+      numbered.push({
+        id: Number(card.dataset.itemId),
+        label: `${groupNo}.${itemIndex + 1}`,
+      });
+    }
+  }
+
+  const total = numbered.length;
   const countEl = document.getElementById('sidebar-item-count');
   if (countEl) {
     countEl.textContent = total ? String(total) : '0';
     countEl.setAttribute('aria-label', `${total} kirtan`);
   }
 
-  ids.forEach((id, index) => {
-    const n = String(index + 1);
-    const cardNum = listEl.querySelector(
+  for (const { id, label } of numbered) {
+    const cardNum = container.querySelector(
       `.item-card[data-item-id="${id}"] .item-number`
     );
     const navNum = navListEl?.querySelector(
       `.nav-item[data-nav-item-id="${id}"] .nav-number`
     );
-    if (cardNum) cardNum.textContent = n;
-    if (navNum) navNum.textContent = n;
-  });
+    if (cardNum) cardNum.textContent = label;
+    if (navNum) navNum.textContent = label;
+  }
 }
 
 function flashElements(elements) {
@@ -50,48 +81,61 @@ function flashElements(elements) {
   }
 }
 
-export function reorderMainList(listEl, ids, { animate = true } = {}) {
-  const draft = listEl.querySelector('.item-card.is-draft');
-  const map = new Map();
-  listEl.querySelectorAll('.item-card[data-item-id]').forEach((el) => {
-    map.set(Number(el.dataset.itemId), el);
-  });
+export function syncMainFromNavStructure() {
+  const container = getGroupsContainer();
+  const navList = document.getElementById('nav-list');
+  if (!container || !navList) return;
 
   const moved = [];
-  if (draft) {
-    listEl.prepend(draft);
-  }
-  for (const id of ids) {
-    const el = map.get(id);
-    if (el) {
-      listEl.appendChild(el);
-      moved.push(el);
+  const navGroups = navList.querySelectorAll('.nav-group[data-nav-group-id]');
+
+  for (const navGroup of navGroups) {
+    const groupId = navGroup.dataset.navGroupId;
+    const mainList = container.querySelector(
+      `.group-card[data-group-id="${groupId}"] .items-list`
+    );
+    if (!mainList) continue;
+
+    const navItems = navGroup.querySelectorAll('.nav-item[data-nav-item-id]');
+    for (const navItem of navItems) {
+      const id = navItem.dataset.navItemId;
+      const card = container.querySelector(`.item-card[data-item-id="${id}"]`);
+      if (card) {
+        mainList.appendChild(card);
+        moved.push(card);
+      }
     }
   }
-  if (animate) flashElements(moved);
+
+  flashElements(moved);
 }
 
-export function reorderNavList(navListEl, ids, { animate = true } = {}) {
-  const map = new Map();
-  navListEl.querySelectorAll('.nav-item[data-nav-item-id]').forEach((el) => {
-    map.set(Number(el.dataset.navItemId), el);
-  });
-
-  const moved = [];
-  for (const id of ids) {
-    const el = map.get(id);
-    if (el) {
-      navListEl.appendChild(el);
-      moved.push(el);
-    }
-  }
-  if (animate) flashElements(moved);
-}
-
-export async function persistOrder(ids) {
+export async function persistAllGroupPositions() {
+  const container = getGroupsContainer();
+  if (!container) return;
   const slug = getSlug();
+  const groupCards = container.querySelectorAll('.group-card[data-group-id]');
+
   try {
-    await savePositions(slug, ids);
+    await Promise.all(
+      [...groupCards].map((groupCard) => {
+        const groupId = groupCard.dataset.groupId;
+        const itemIds = [...groupCard.querySelectorAll('.item-card[data-item-id]')].map((el) =>
+          Number(el.dataset.itemId)
+        );
+        return fetch(`/api/groups/${groupId}/items/positions`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ itemIds }),
+        });
+      })
+    );
+    const groupIds = [...groupCards].map((g) => Number(g.dataset.groupId));
+    await fetch(`/api/playlists/${encodeURIComponent(slug)}/groups/positions`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ groupIds }),
+    });
   } catch {
     showToast('Failed to save order', 'danger');
   }

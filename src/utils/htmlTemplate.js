@@ -15,28 +15,46 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-export function renderLandingHtml(baseUrl) {
-  return readTemplate('index.html')
-    .replace(/\{\{OG_TITLE\}\}/g, 'Kirtan Playlist')
-    .replace(/\{\{OG_DESCRIPTION\}\}/g, 'Create a shareable playlist of kirtan lyrics in Unicode.')
-    .replace(/\{\{OG_URL\}\}/g, baseUrl);
+function applyOgPlaceholders(html, { ogTitle, ogDescription, ogUrl }) {
+  return html
+    .replace(/\{\{OG_TITLE\}\}/g, ogTitle)
+    .replace(/\{\{OG_DESCRIPTION\}\}/g, ogDescription)
+    .replace(/\{\{OG_URL\}\}/g, ogUrl);
 }
 
-export function renderPlaylistHtml({ slug, baseUrl, notFound = false }) {
+export function renderLandingHtml(baseUrl) {
+  return applyOgPlaceholders(readTemplate('index.html'), {
+    ogTitle: 'Kirtan Playlist',
+    ogDescription: 'Create a shareable playlist of kirtan lyrics in Unicode.',
+    ogUrl: baseUrl,
+  });
+}
+
+export function renderPlaylistHtml({ slug, baseUrl, title, notFound = false }) {
   const pageUrl = `${baseUrl}/p/${encodeURIComponent(slug)}`;
   const tpl = readTemplate('playlist.html');
+
   if (notFound) {
-    return tpl
-      .replace(/\{\{OG_TITLE\}\}/g, 'Playlist not found')
-      .replace(/\{\{OG_DESCRIPTION\}\}/g, 'This playlist does not exist.')
-      .replace(/\{\{OG_URL\}\}/g, pageUrl)
+    return applyOgPlaceholders(tpl, {
+      ogTitle: 'Playlist not found — Kirtan Playlist',
+      ogDescription: 'This playlist does not exist or may have been deleted.',
+      ogUrl: pageUrl,
+    })
       .replace(/\{\{SLUG\}\}/g, escapeHtml(slug))
-      .replace(/\{\{NOT_FOUND\}\}/g, 'true');
+      .replace(/\{\{NOT_FOUND\}\}/g, 'true')
+      .replace(/\{\{PLAYLIST_TITLE\}\}/g, 'Playlist not found');
   }
-  return tpl
-    .replace(/\{\{OG_TITLE\}\}/g, 'Kirtan Playlist')
-    .replace(/\{\{OG_DESCRIPTION\}\}/g, 'Shared kirtan lyric playlist.')
-    .replace(/\{\{OG_URL\}\}/g, pageUrl)
+
+  const safeTitle = escapeHtml(title || 'Kirtan Playlist');
+  const ogTitle = `${safeTitle} — Kirtan Playlist`;
+  const ogDescription = `Shared kirtan lyric playlist: ${safeTitle}. Open to view and edit Unicode lyrics.`;
+
+  return applyOgPlaceholders(tpl, {
+    ogTitle,
+    ogDescription,
+    ogUrl: pageUrl,
+  })
     .replace(/\{\{SLUG\}\}/g, escapeHtml(slug))
-    .replace(/\{\{NOT_FOUND\}\}/g, 'false');
+    .replace(/\{\{NOT_FOUND\}\}/g, 'false')
+    .replace(/\{\{PLAYLIST_TITLE\}\}/g, safeTitle);
 }

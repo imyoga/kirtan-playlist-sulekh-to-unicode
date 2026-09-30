@@ -11,6 +11,19 @@
 }
 .landing-sub {
   color: var(--muted);
-  margin: 0 0 2rem;
+  margin: 0 0 1.5rem;
   font-size: 0.95rem;
+}
+
+.landing .landing-form {
+  text-align: left;
+}
+
+.landing-input {
+  font: inherit;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  box-sizing: border-box;
 }

@@ -1,28 +1,56 @@
 import Sortable from '../vendor/sortable.esm.js';
 import {
-  getMainOrderedIds,
-  reorderNavList,
-  persistOrder,
+  persistAllGroupPositions,
   runOrderSync,
   refreshItemNumbers,
 } from './order-sync.js';
+import { rebuildSidebarNav } from './sidebar.js';
 
-let sortableMain = null;
+let groupsSortable = null;
 
-export function initSortable(listEl, navListEl) {
-  if (!listEl || sortableMain) return;
-  sortableMain = Sortable.create(listEl, {
-    animation: 180,
+export function setupItemsListSortable(itemsListEl, groupId) {
+  if (!itemsListEl) return null;
+  if (itemsListEl._sortable) {
+    itemsListEl._sortable.destroy();
+  }
+
+  const sortable = Sortable.create(itemsListEl, {
+    group: { name: 'kirtan-items', pull: true, put: true },
     handle: '.drag-handle',
     draggable: '.item-card:not(.is-draft)',
+    animation: 180,
     ghostClass: 'sortable-ghost',
-    onEnd() {
-      const ids = getMainOrderedIds(listEl);
+    onEnd(evt) {
+      const fromGroupId = evt.from.closest('.group-card')?.dataset.groupId;
+      const toGroupId = evt.to.closest('.group-card')?.dataset.groupId;
+      const navListEl = document.getElementById('nav-list');
+
       runOrderSync(() => {
-        if (navListEl) reorderNavList(navListEl, ids, { animate: true });
-        refreshItemNumbers(listEl, navListEl);
-        persistOrder(ids);
+        rebuildSidebarNav();
+        refreshItemNumbers(document.getElementById('nav-list'));
+        if (fromGroupId && toGroupId && fromGroupId !== toGroupId) {
+          evt.item.dataset.groupId = toGroupId;
+        }
+        persistAllGroupPositions();
       });
+    },
+  });
+
+  itemsListEl._sortable = sortable;
+  return sortable;
+}
+
+export function initGroupsSortable(containerEl) {
+  if (!containerEl || groupsSortable) return;
+  groupsSortable = Sortable.create(containerEl, {
+    animation: 200,
+    handle: '.group-header .drag-handle',
+    draggable: '.group-card',
+    ghostClass: 'group-sortable-ghost',
+    onEnd() {
+      persistAllGroupPositions();
+      const navListEl = document.getElementById('nav-list');
+      refreshItemNumbers(navListEl);
     },
   });
 }

@@ -8,13 +8,19 @@
   <meta property="og:title" content="{{OG_TITLE}}">
   <meta property="og:description" content="{{OG_DESCRIPTION}}">
   <meta property="og:url" content="{{OG_URL}}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{OG_TITLE}}">
+  <meta name="twitter:description" content="{{OG_DESCRIPTION}}">
+  <meta name="theme-color" content="#404040">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/items.css">
+  <link rel="stylesheet" href="/css/groups.css">
   <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/playlist-header.css">
   <link rel="stylesheet" href="/css/toast.css">
 </head>
 <body data-slug="{{SLUG}}" data-not-found="{{NOT_FOUND}}" class="playlist-shell">
@@ -39,13 +45,35 @@
         </button>
         <a href="/" class="nav-link">Home</a>
         <div class="header-actions">
+          <button type="button" id="share-btn" class="btn-share" title="Share playlist">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+            </svg>
+            Share
+          </button>
           <button type="button" id="add-item-btn" class="icon-btn" title="Add item" aria-label="Add item">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
           </button>
         </div>
       </header>
+      <div class="playlist-title-row">
+        <h1 id="display-title" class="playlist-title" title="Click to rename" tabindex="0">{{PLAYLIST_TITLE}}</h1>
+        <button type="button" id="edit-title-btn" class="icon-btn" aria-label="Rename playlist" title="Rename">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15" aria-hidden="true">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+          </svg>
+        </button>
+      </div>
       <div id="not-found" class="not-found hidden">Playlist not found.</div>
-      <ul id="items-list" class="items-list"></ul>
+      <div class="add-group-bar">
+        <button type="button" id="show-add-group-btn" class="btn btn-primary">+ Group</button>
+        <form id="add-group-form" class="add-group-form hidden" autocomplete="off">
+          <input type="text" id="add-group-input" class="add-group-input" placeholder="Group name" maxlength="80" />
+          <button type="submit" class="btn-add-group-submit">Add</button>
+        </form>
+      </div>
+      <div id="groups-container" class="groups-container"></div>
     </div>
   </div>
 

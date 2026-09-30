@@ -21,14 +21,28 @@ export async function renderPlaylist(req, res) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(404).send(html);
   }
-  const html = renderPlaylistHtml({ slug, baseUrl, notFound: false });
+  const html = renderPlaylistHtml({
+    slug,
+    baseUrl,
+    title: playlist.title || 'Kirtan Playlist',
+    notFound: false,
+  });
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   return res.send(html);
 }
 
 export async function createPlaylist(req, res) {
-  const playlist = await playlistService.createPlaylist();
+  const title = req.body?.title;
+  const playlist = await playlistService.createPlaylist(title);
   res.status(201).json(playlist);
+}
+
+export async function patchPlaylist(req, res) {
+  const title = (req.body?.title || '').trim();
+  if (!title) return res.status(400).json({ error: 'title is required' });
+  const playlist = await playlistService.updatePlaylistTitle(req.params.slug, title);
+  if (!playlist) return res.status(404).json({ error: 'Playlist not found' });
+  res.json({ playlist });
 }
 
 export async function getPlaylist(req, res) {
@@ -40,7 +54,8 @@ export async function getPlaylist(req, res) {
 export async function addItem(req, res) {
   const text = (req.body?.text || '').trim();
   if (!text) return res.status(400).json({ error: 'text is required' });
-  const result = await playlistService.addItem(req.params.slug, text);
+  const groupId = req.body?.groupId ? Number(req.body.groupId) : undefined;
+  const result = await playlistService.addItem(req.params.slug, text, groupId);
   if (!result) return res.status(404).json({ error: 'Playlist not found' });
   res.status(201).json(result);
 }
@@ -57,14 +72,6 @@ export async function deleteItem(req, res) {
   const ok = await playlistService.removeItem(Number(req.params.id));
   if (!ok) return res.status(404).json({ error: 'Item not found' });
   res.status(204).end();
-}
-
-export async function reorderItems(req, res) {
-  const itemIds = req.body?.itemIds;
-  if (!Array.isArray(itemIds)) return res.status(400).json({ error: 'itemIds array required' });
-  const ok = await playlistService.reorderItems(req.params.slug, itemIds.map(Number));
-  if (!ok) return res.status(404).json({ error: 'Playlist not found' });
-  res.json({ ok: true });
 }
 
 export async function toSulekh(req, res) {
