@@ -34,12 +34,14 @@ function iconSvg(name) {
   return '';
 }
 
-function bindItemCard(li, item, { onRemove, isDraft = false, onConfirmDraft } = {}) {
+function bindItemCard(li, item, { onRemove, isDraft = false, onConfirmDraft, onTitleChange, onRemoved } = {}) {
   const titleEl = li.querySelector('.item-title');
   const textarea = li.querySelector('.item-text');
 
   const refreshTitle = () => {
-    titleEl.textContent = itemTitleFromText(textarea.value);
+    const title = itemTitleFromText(textarea.value);
+    titleEl.textContent = title;
+    if (!isDraft && item.id) onTitleChange?.(item.id, title);
   };
 
   textarea.addEventListener('input', () => {
@@ -89,6 +91,7 @@ function bindItemCard(li, item, { onRemove, isDraft = false, onConfirmDraft } = 
       try {
         await deleteItem(item.id);
         li.remove();
+        onRemoved?.(item.id);
       } catch {
         showToast('Delete failed', 'danger');
       }
@@ -103,13 +106,15 @@ export function fitItemTextarea(textarea) {
   if (textarea) scheduleAutoGrow(textarea);
 }
 
-export function buildItemElement(item) {
+export function buildItemElement(item, hooks = {}) {
   const li = document.createElement('li');
   li.className = 'item-card';
+  li.id = `item-${item.id}`;
   li.dataset.itemId = String(item.id);
   li.innerHTML = `
     <div class="item-top">
       <button type="button" class="drag-handle" aria-label="Drag to reorder">${iconSvg('drag') || '⋮⋮'}</button>
+      <span class="item-number" aria-hidden="true">0</span>
       <span class="item-title"></span>
       <div class="item-actions">
         <button type="button" data-copy-unicode" title="Copy Unicode">${iconSvg('copy')}</button>
@@ -120,7 +125,7 @@ export function buildItemElement(item) {
     <textarea class="item-text" rows="1" spellcheck="false"></textarea>
   `;
   li.querySelector('.item-text').value = item.text || '';
-  bindItemCard(li, item);
+  bindItemCard(li, item, hooks);
   return li;
 }
 

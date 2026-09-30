@@ -1,22 +1,28 @@
 import Sortable from '../vendor/sortable.esm.js';
-import { savePositions, getSlug } from './api.js';
-import { showToast } from './toast.js';
+import {
+  getMainOrderedIds,
+  reorderNavList,
+  persistOrder,
+  runOrderSync,
+  refreshItemNumbers,
+} from './order-sync.js';
 
-let sortable = null;
+let sortableMain = null;
 
-export function initSortable(listEl) {
-  if (!listEl || sortable) return;
-  sortable = Sortable.create(listEl, {
-    animation: 150,
+export function initSortable(listEl, navListEl) {
+  if (!listEl || sortableMain) return;
+  sortableMain = Sortable.create(listEl, {
+    animation: 180,
     handle: '.drag-handle',
     draggable: '.item-card:not(.is-draft)',
     ghostClass: 'sortable-ghost',
     onEnd() {
-      const slug = getSlug();
-      const ids = [...listEl.querySelectorAll('.item-card[data-item-id]')].map((el) =>
-        Number(el.dataset.itemId)
-      );
-      savePositions(slug, ids).catch(() => showToast('Failed to save order', 'danger'));
+      const ids = getMainOrderedIds(listEl);
+      runOrderSync(() => {
+        if (navListEl) reorderNavList(navListEl, ids, { animate: true });
+        refreshItemNumbers(listEl, navListEl);
+        persistOrder(ids);
+      });
     },
   });
 }

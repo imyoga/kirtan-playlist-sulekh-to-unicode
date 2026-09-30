@@ -1,8 +1,4 @@
-.page { max-width: 720px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 .page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   margin-bottom: 1rem;
 }
 .items-list {
@@ -37,6 +33,15 @@
   display: flex;
 }
 .drag-handle:active { cursor: grabbing; }
+.item-number {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 1.25rem;
+  text-align: center;
+}
 .item-title {
   flex: 1;
   font-size: 0.8rem;

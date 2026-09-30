@@ -1,20 +1,38 @@
 import { getSlug, fetchPlaylist, createItem } from './api.js';
 import { buildItemElement, buildDraftElement, fitItemTextarea } from './items.js';
 import { initSortable } from './drag-drop.js';
+import {
+  initSidebarLayout,
+  addNavItem,
+  removeNavItem,
+  updateNavItemTitle,
+} from './sidebar.js';
+import { refreshItemNumbers } from './order-sync.js';
 import { showToast } from './toast.js';
 
 const slug = getSlug();
 const notFound = document.body.dataset.notFound === 'true';
 const listEl = document.getElementById('items-list');
+const navListEl = document.getElementById('nav-list');
 const notFoundEl = document.getElementById('not-found');
 const addBtn = document.getElementById('add-item-btn');
+
+const itemHooks = {
+  onTitleChange: (id, title) => updateNavItemTitle(id, title),
+  onRemoved: (id) => {
+    removeNavItem(id);
+    refreshItemNumbers(listEl, navListEl);
+  },
+};
 
 let draftOpen = false;
 
 function mountItem(item) {
-  const el = buildItemElement(item);
+  const el = buildItemElement(item, itemHooks);
   listEl.appendChild(el);
   fitItemTextarea(el.querySelector('.item-text'));
+  addNavItem(item);
+  refreshItemNumbers(listEl, navListEl);
   return el;
 }
 
@@ -47,6 +65,14 @@ function openDraft() {
 }
 
 async function init() {
+  initSidebarLayout({
+    listEl,
+    navList: navListEl,
+    sidebar: document.getElementById('playlist-sidebar'),
+    toggleBtn: document.getElementById('sidebar-toggle'),
+    backdrop: document.getElementById('sidebar-backdrop'),
+  });
+
   if (notFound) {
     notFoundEl?.classList.remove('hidden');
     addBtn?.setAttribute('disabled', 'true');
@@ -62,7 +88,8 @@ async function init() {
     for (const item of playlist.items || []) {
       mountItem(item);
     }
-    initSortable(listEl);
+    refreshItemNumbers(listEl, navListEl);
+    initSortable(listEl, navListEl);
   } catch {
     showToast('Failed to load playlist', 'danger');
   }

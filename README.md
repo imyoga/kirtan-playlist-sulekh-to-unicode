@@ -57,10 +57,12 @@ See [`.env.example`](.env.example). Do not commit `.env`.
 
 ### Playlist page (`/p/:slug`)
 
+- **Contents sidebar** — lists each item’s title (first line, truncated) with a **1-based index**; the header shows the **total kirtan count**. Click a title to scroll to that lyric. Drag titles in the sidebar to reorder; the main list follows with a short highlight animation (and vice versa when dragging cards). Numbers update after reorder, add, or delete. On **desktop (≥960px)** the sidebar stays open; on **mobile**, use the **hamburger** button to open/close it (backdrop tap closes).
 - **Add item (+)** — opens a draft card with a textarea. Paste Sulekh or Unicode, then confirm with the check button or **Enter** (use **Shift+Enter** for a new line in the draft).
 - **Sulekh input** — on add, text is converted to Unicode on the server; a toast confirms conversion.
 - **Unicode input** — stored as-is (no conversion toast). Sulekh is generated when you use **Copy Sulekh**.
 - **Item card**
+  - **Number** — position in the playlist (1, 2, 3…), kept in sync with the sidebar.
   - **Title** — first non-empty line of the lyric, up to ~7 words with ellipsis.
   - **Editable Unicode text** — 16px Noto Sans Gujarati; textarea grows with content (no inner scrollbar).
   - **Drag handle** — reorder items; order is saved automatically.
