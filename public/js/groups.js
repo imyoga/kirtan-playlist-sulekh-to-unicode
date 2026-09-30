@@ -9,6 +9,7 @@ import {
   updateNavGroupName,
 } from './sidebar.js';
 import { showToast } from './toast.js';
+import { confirmDialog } from './confirm-dialog.js';
 
 const itemHooks = {
   onTitleChange: (id, title) => updateNavItemTitle(id, title),
@@ -213,7 +214,28 @@ async function handleDeleteGroup(groupId, groupCard) {
     showToast('Keep at least one group', 'danger');
     return;
   }
-  if (!confirm('Delete this group and all kirtans inside it?')) return;
+
+  const groupName = groupCard.querySelector('.group-name')?.textContent?.trim() || '';
+  const itemCount = groupCard.querySelectorAll('.item-card[data-item-id]').length;
+  let message;
+  if (groupName) {
+    message = itemCount > 0
+      ? `Are you sure you want to delete "${groupName}" and the ${itemCount} kirtan${itemCount === 1 ? '' : 's'} inside it?`
+      : `Are you sure you want to delete "${groupName}"?`;
+  } else {
+    message = itemCount > 0
+      ? `Are you sure you want to delete this group and all ${itemCount} kirtans inside it?`
+      : 'Are you sure you want to delete this group?';
+  }
+
+  const confirmed = await confirmDialog({
+    title: 'Delete group?',
+    message,
+    confirmText: 'Delete group',
+    cancelText: 'Cancel',
+    danger: true,
+  });
+  if (!confirmed) return;
 
   try {
     await deleteGroupApi(groupId);

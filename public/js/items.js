@@ -1,12 +1,13 @@
 import { itemTitleFromText } from './title.js';
 import { updateItem, deleteItem, fetchSulekh } from './api.js';
 import { copyText, showToast } from './toast.js';
+import { confirmDialog } from './confirm-dialog.js';
 
 const saveTimers = new Map();
 
 function autoGrow(textarea) {
   textarea.style.height = '0';
-  const next = Math.max(textarea.scrollHeight, 28);
+  const next = Math.max(textarea.scrollHeight, 24);
   textarea.style.height = `${next}px`;
 }
 
@@ -98,6 +99,16 @@ function bindItemCard(li, item, { onRemove, isDraft = false, onConfirmDraft, onT
     li.querySelector('.btn-delete-item')?.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
+      const currentTitle = itemTitleFromText(textarea.value);
+      const titleSnippet = currentTitle && currentTitle !== 'Untitled' ? `"${currentTitle}"` : 'this kirtan';
+      const confirmed = await confirmDialog({
+        title: 'Delete kirtan?',
+        message: `Are you sure you want to delete ${titleSnippet}? This action cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        danger: true,
+      });
+      if (!confirmed) return;
       try {
         await deleteItem(item.id);
         li.remove();

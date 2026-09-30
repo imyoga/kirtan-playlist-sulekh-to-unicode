@@ -1,7 +1,7 @@
 .playlist-shell {
-  --header-h: 56px;
-  --sidebar-w: 300px;
-  --main-pad: 1rem;
+  --header-h: 48px;
+  --sidebar-w: 280px;
+  --main-pad: 0.85rem;
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -219,13 +219,13 @@ body.sidebar-open .sidebar-backdrop {
 .item-card { scroll-margin-top: calc(var(--header-h) + 1rem); }
 
 @media (min-width: 640px) {
-  .playlist-shell { --main-pad: 1.5rem; }
+  .playlist-shell { --main-pad: 1rem; }
 }
 
 @media (min-width: 960px) {
   .playlist-shell {
-    --header-h: 60px;
-    --main-pad: 2.5rem;
+    --header-h: 48px;
+    --main-pad: 1.25rem;
   }
 
   /* Sidebar docks under the app bar and scrolls independently */
@@ -247,5 +247,5 @@ body.sidebar-open .sidebar-backdrop {
   .sidebar-backdrop { display: none; }
   .sidebar-toggle { display: none; }
 
-  .playlist-main { padding-top: 1.5rem; }
+  .playlist-main { padding-top: 0.75rem; }
 }
