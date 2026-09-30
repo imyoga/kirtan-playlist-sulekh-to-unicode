@@ -3075,6 +3075,14 @@
         } // end of Indian_Script_to_Devanagari function
         // updated on 11-07-2016
 
+        // PDF / copy-paste often uses "1/2" style fractions instead of ½ ¼ ¾ glyphs.
+        function normalize_sulekh_fraction_glyphs(text) {
+            return text
+                .replace(/1\u20442/g, "\u00BD")
+                .replace(/1\u20444/g, "\u00BC")
+                .replace(/3\u20444/g, "\u00BE");
+        }
+
         function convert_to_unicode() {
 
             var array_one = new Array(
@@ -3591,6 +3599,7 @@
 
                 if (modified_substring != "")  // if string to be converted is non-blank then no need of any processing.
                 {
+                    modified_substring = normalize_sulekh_fraction_glyphs(modified_substring);
 
                     for (input_symbol_idx = 0; input_symbol_idx < array_one_length - 1; input_symbol_idx = input_symbol_idx + 2) {
                         idx = 0;  // index of the symbol being searched for replacement
