@@ -18,12 +18,5 @@
     "express": "^4.21.2",
     "pg": "^8.13.3",
     "sortablejs": "^1.15.7"
-  },
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.15.1",
-      "onFail": "download"
-    }
   }
 }
