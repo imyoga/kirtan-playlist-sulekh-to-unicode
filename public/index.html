@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{OG_TITLE}}</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{OG_TITLE}}">
+  <meta property="og:description" content="{{OG_DESCRIPTION}}">
+  <meta property="og:url" content="{{OG_URL}}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/landing.css">
+  <link rel="stylesheet" href="/css/toast.css">
+</head>
+<body>
+  <main class="landing">
+    <h1 class="landing-title">Kirtan playlist</h1>
+    <p class="landing-sub">Paste Sulekh or Unicode lyrics. Share one link — no login.</p>
+    <button type="button" id="create-playlist-btn" class="btn btn-primary">Create playlist</button>
+  </main>
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+  <script type="module" src="/js/landing.js"></script>
+</body>
+</html>

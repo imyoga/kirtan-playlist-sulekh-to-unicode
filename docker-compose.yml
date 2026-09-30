@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kirtan-playlist-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: kirtan_playlist
+    ports:
+      - "5434:5432"
+    volumes:
+      - kirtan_playlist_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kirtan_playlist"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  kirtan_playlist_pg:

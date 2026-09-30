@@ -1,0 +1,29 @@
+{
+  "name": "kirtan-playlist-unicode",
+  "version": "1.0.0",
+  "description": "Shareable kirtan lyric playlists with Sulekh Unicode conversion",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test tests/**/*.test.js",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "extract-maps": "node scripts/extract-maps.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.3",
+    "sortablejs": "^1.15.7"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.15.1",
+      "onFail": "download"
+    }
+  }
+}
