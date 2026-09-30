@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { getSlug, createGroup, deleteGroupApi, renameGroup } from './api.js';
-import { buildItemElement, buildDraftElement, fitItemTextarea } from './items.js';
+import { buildItemElement, buildDraftElement, fitItemTextarea, GRIP_SVG } from './items.js';
 import { setupItemsListSortable } from './drag-drop.js';
 import { refreshItemNumbers, getNextItemLabelForItemsList } from './order-sync.js';
 import {
@@ -30,7 +30,7 @@ export function createGroupElement(group) {
   dragHandle.type = 'button';
   dragHandle.className = 'drag-handle';
   dragHandle.setAttribute('aria-label', 'Drag group to reorder');
-  dragHandle.textContent = '⋮⋮';
+  dragHandle.innerHTML = GRIP_SVG;
 
   const nameEl = document.createElement('h2');
   nameEl.className = 'group-name';
@@ -46,11 +46,10 @@ export function createGroupElement(group) {
 
   const addInGroupBtn = document.createElement('button');
   addInGroupBtn.type = 'button';
-  addInGroupBtn.className = 'icon-btn';
+  addInGroupBtn.className = 'btn-add-kirtan';
   addInGroupBtn.title = 'Add kirtan in this group';
-  addInGroupBtn.setAttribute('aria-label', 'Add kirtan');
   addInGroupBtn.innerHTML =
-    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Add kirtan</span>';
 
   const deleteBtn = document.createElement('button');
   deleteBtn.type = 'button';

@@ -1,36 +1,45 @@
 .playlist-shell {
+  --header-h: 56px;
+  --sidebar-w: 300px;
+  --main-pad: 1rem;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
-.playlist-layout {
+/* Full-width body: sidebar on the left, content column centered in the rest */
+.app-body {
   display: flex;
   align-items: flex-start;
-  max-width: 1100px;
-  margin: 0 auto;
-  min-height: calc(100vh - 2rem);
+  width: 100%;
+  min-height: calc(100dvh - var(--header-h));
 }
 
 .playlist-sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 40;
-  width: min(280px, 86vw);
+  z-index: 50;
+  width: min(300px, 86vw);
   height: 100vh;
+  height: 100dvh;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   transform: translateX(-105%);
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  visibility: hidden;
+  transition: transform 0.3s var(--ease), visibility 0s linear 0.3s;
   display: flex;
   flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 35;
-  background: rgba(15, 23, 42, 0.35);
+  z-index: 45;
+  background: rgba(10, 35, 20, 0.4);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
@@ -38,6 +47,8 @@
 
 body.sidebar-open .playlist-sidebar {
   transform: translateX(0);
+  visibility: visible;
+  transition: transform 0.3s var(--ease), visibility 0s;
 }
 
 body.sidebar-open .sidebar-backdrop {
@@ -50,41 +61,39 @@ body.sidebar-open .sidebar-backdrop {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.85rem 1rem 0.65rem;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  padding: 1rem 1rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .sidebar-count {
-  font-variant-numeric: tabular-nums;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full, 9999px);
   min-width: 1.75rem;
-  padding: 0.1rem 0.45rem;
-  text-align: center;
-  text-transform: none;
+  padding: 0.1rem 0.5rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  font-weight: 700;
   letter-spacing: 0;
+  text-align: center;
+  color: var(--accent-hover);
+  background: var(--accent-soft);
+  border-radius: var(--radius-full);
 }
 
 .nav-list {
   list-style: none;
   margin: 0;
-  padding: 0.5rem 0.5rem 1rem;
+  padding: 0 0.5rem calc(1rem + var(--safe-bottom));
   overflow-y: auto;
+  overscroll-behavior: contain;
   flex: 1;
 }
 
 .nav-group {
   list-style: none;
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.75rem;
   padding: 0;
 }
 
@@ -92,28 +101,28 @@ body.sidebar-open .sidebar-backdrop {
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: 0.35rem 0.5rem 0.4rem;
-  margin-bottom: 0.25rem;
-  font-size: 0.7rem;
+  padding: 0.5rem 0.6rem 0.35rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+  background: linear-gradient(var(--surface) 75%, rgba(255, 255, 255, 0));
 }
 
 .nav-group-items {
   list-style: none;
   margin: 0;
-  padding: 0 0 0 0.15rem;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.1rem;
+  min-height: 8px;
 }
 
 .nav-empty {
-  padding: 1rem;
+  margin: 0;
+  padding: 1.5rem 1rem;
   font-size: 0.85rem;
   color: var(--muted);
   text-align: center;
@@ -122,61 +131,53 @@ body.sidebar-open .sidebar-backdrop {
 .nav-item {
   display: flex;
   align-items: stretch;
-  gap: 0.15rem;
-  margin-bottom: 0.25rem;
-  border-radius: var(--radius);
-  background: var(--bg);
-  border: 1px solid transparent;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s var(--ease);
 }
-
-.nav-item.sortable-ghost {
-  opacity: 0.45;
-}
+.nav-item:hover { background: var(--accent-soft); }
+.nav-item.sortable-ghost { opacity: 0.4; background: var(--accent-soft); }
 
 .nav-drag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
   width: 28px;
+  padding: 0;
   border: none;
   background: transparent;
-  color: var(--muted);
+  color: #b3c8ba;
   cursor: grab;
-  font-size: 0.7rem;
-  line-height: 1;
-  padding: 0;
-  border-radius: var(--radius) 0 0 var(--radius);
+  touch-action: none;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
-
-.nav-drag:active {
-  cursor: grabbing;
-}
+.nav-drag:hover { color: var(--accent); }
+.nav-drag:active { cursor: grabbing; }
+.nav-drag svg { display: block; pointer-events: none; }
 
 .nav-jump {
   flex: 1;
   min-width: 0;
+  min-height: 42px;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
   border: none;
   background: transparent;
   text-align: left;
-  padding: 0.55rem 0.5rem 0.55rem 0;
+  padding: 0.45rem 0.5rem 0.45rem 0;
   cursor: pointer;
-  border-radius: 0 var(--radius) var(--radius) 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .nav-number {
   flex: 0 0 auto;
+  min-width: 1.9rem;
   font-variant-numeric: tabular-nums;
   font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--muted);
-  min-width: 2.25rem;
+  font-weight: 700;
+  color: var(--accent);
   text-align: right;
-}
-
-.nav-jump:hover {
-  background: rgba(0, 0, 0, 0.03);
 }
 
 .nav-title {
@@ -184,8 +185,8 @@ body.sidebar-open .sidebar-backdrop {
   flex: 1;
   min-width: 0;
   font-family: var(--font-guj);
-  font-size: 0.82rem;
-  line-height: 1.35;
+  font-size: 0.88rem;
+  line-height: 1.4;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -195,77 +196,56 @@ body.sidebar-open .sidebar-backdrop {
 .playlist-main {
   flex: 1;
   min-width: 0;
+  padding: 0.5rem var(--main-pad) calc(5rem + var(--safe-bottom));
+}
+
+/* Centered reading column */
+.content {
   width: 100%;
-  padding: 1rem 1rem 3rem;
+  max-width: 780px;
+  margin: 0 auto;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.page-header .nav-link {
-  margin-right: auto;
-}
-
-.sidebar-toggle {
-  display: inline-flex;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
+.sidebar-toggle { display: inline-flex; }
 
 @keyframes syncHighlight {
-  0% {
-    box-shadow: 0 0 0 0 rgba(64, 64, 64, 0.35);
-    transform: translateY(0);
-  }
-  40% {
-    box-shadow: 0 0 0 3px rgba(64, 64, 64, 0.12);
-    transform: translateY(-1px);
-  }
-  100% {
-    box-shadow: none;
-    transform: translateY(0);
-  }
+  0% { box-shadow: 0 0 0 0 var(--accent-ring); }
+  40% { box-shadow: 0 0 0 5px var(--accent-ring); }
+  100% { box-shadow: 0 0 0 0 rgba(26, 138, 78, 0); }
 }
 
-.sync-highlight {
-  animation: syncHighlight 0.45s ease;
-}
+.sync-highlight { animation: syncHighlight 0.6s ease; }
 
-.item-card {
-  scroll-margin-top: 1rem;
+.item-card { scroll-margin-top: calc(var(--header-h) + 1rem); }
+
+@media (min-width: 640px) {
+  .playlist-shell { --main-pad: 1.5rem; }
 }
 
 @media (min-width: 960px) {
+  .playlist-shell {
+    --header-h: 60px;
+    --main-pad: 2.5rem;
+  }
+
+  /* Sidebar docks under the app bar and scrolls independently */
   .playlist-sidebar {
     position: sticky;
-    top: 0;
+    top: var(--header-h);
+    z-index: 1;
     transform: none;
-    height: 100vh;
-    flex: 0 0 260px;
+    visibility: visible;
+    flex: 0 0 var(--sidebar-w);
+    width: var(--sidebar-w);
+    height: calc(100vh - var(--header-h));
+    height: calc(100dvh - var(--header-h));
+    padding-top: 0;
     box-shadow: none;
+    transition: none;
   }
 
-  .sidebar-backdrop {
-    display: none;
-  }
+  .sidebar-backdrop { display: none; }
+  .sidebar-toggle { display: none; }
 
-  .sidebar-toggle {
-    display: none;
-  }
-
-  .playlist-layout {
-    gap: 0;
-  }
-
-  .playlist-main {
-    padding-left: 1.25rem;
-    max-width: 720px;
-  }
+  .playlist-main { padding-top: 1.5rem; }
 }

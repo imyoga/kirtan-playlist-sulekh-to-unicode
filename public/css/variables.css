@@ -1,13 +1,35 @@
 :root {
-  --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-guj: 'Noto Sans Gujarati', 'Nirmala UI', Shruti, sans-serif;
-  --bg: #fafafa;
-  --surface: #fff;
-  --text: #171717;
-  --muted: #737373;
-  --border: #e5e5e5;
-  --accent: #404040;
-  --accent-hover: #262626;
-  --radius: 8px;
-  --shadow: 0 1px 2px rgba(0,0,0,.06);
+
+  /* Light green theme */
+  --bg: #f3f9f5;
+  --bg-tint: #e8f5ec;
+  --surface: #ffffff;
+  --surface-2: #f8fcf9;
+  --text: #0f2418;
+  --muted: #5d7667;
+  --border: #dbeae0;
+  --border-strong: #c3dccb;
+
+  --accent: #1a8a4e;
+  --accent-hover: #12703d;
+  --accent-soft: #e3f4ea;
+  --accent-soft-hover: #d3edde;
+  --accent-ring: rgba(26, 138, 78, 0.22);
+  --danger: #c2362e;
+  --danger-soft: #fdecea;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 60, 35, 0.06);
+  --shadow: 0 1px 2px rgba(15, 60, 35, 0.05), 0 4px 14px rgba(15, 60, 35, 0.05);
+  --shadow-lg: 0 10px 30px rgba(15, 60, 35, 0.14);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --tap: 44px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }

@@ -1,5 +1,6 @@
 import Sortable from '../vendor/sortable.esm.js';
 import { itemTitleFromText } from './title.js';
+import { GRIP_SVG } from './items.js';
 import {
   syncMainFromNavStructure,
   persistAllGroupPositions,
@@ -18,7 +19,7 @@ export function createNavItem(item) {
   li.dataset.navItemId = String(item.id);
   const title = itemTitleFromText(item.text || '');
   li.innerHTML = `
-    <button type="button" class="nav-drag" aria-label="Drag to reorder" title="Drag to reorder">⋮⋮</button>
+    <button type="button" class="nav-drag" aria-label="Drag to reorder" title="Drag to reorder">${GRIP_SVG}</button>
     <button type="button" class="nav-jump">
       <span class="nav-number" aria-hidden="true">0</span>
       <span class="nav-title"></span>

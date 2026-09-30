@@ -8,12 +8,13 @@
   <meta property="og:title" content="{{OG_TITLE}}">
   <meta property="og:description" content="{{OG_DESCRIPTION}}">
   <meta property="og:url" content="{{OG_URL}}">
+  <meta name="theme-color" content="#f3f9f5">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{{OG_TITLE}}">
   <meta name="twitter:description" content="{{OG_DESCRIPTION}}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/landing.css">
@@ -22,12 +23,22 @@
 </head>
 <body>
   <main class="landing">
+    <div class="landing-logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+      </svg>
+    </div>
     <h1 class="landing-title">Kirtan playlist</h1>
     <p class="landing-sub">Paste Sulekh or Unicode lyrics. Share one link — no login.</p>
     <form id="create-playlist-form" class="landing-form" autocomplete="off">
-      <input type="text" id="playlist-title-input" class="landing-input" placeholder="Playlist name (e.g. Sunday kirtan)" maxlength="120" />
+      <input type="text" id="playlist-title-input" class="landing-input" placeholder="Playlist name (e.g. Sunday kirtan)" maxlength="120" aria-label="Playlist name" enterkeyhint="go" />
       <button type="submit" id="create-playlist-btn" class="btn btn-primary">Create playlist</button>
     </form>
+    <ul class="landing-features">
+      <li>Sulekh to Unicode</li>
+      <li>Share with one link</li>
+      <li>No login</li>
+    </ul>
   </main>
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
   <script type="module" src="/js/landing.js"></script>
