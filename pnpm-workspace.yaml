@@ -1,0 +1,4 @@
+minimumReleaseAgeExclude:
+  - pg-cloudflare@1.4.1
+  - pg-connection-string@2.14.1
+  - pg-protocol@1.16.1

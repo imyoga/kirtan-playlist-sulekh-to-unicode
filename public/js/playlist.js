@@ -11,6 +11,7 @@ import { state, setPlaylist } from './state.js';
 import { setPlaylistTitleDisplay, makeTitleEditable } from './playlist-title.js';
 import { handleShare } from './share.js';
 import { showToast } from './toast.js';
+import { initWebSocket } from './websocket.js';
 
 const slug = getSlug();
 state.slug = slug;
@@ -47,6 +48,7 @@ async function init() {
     renderGroups(playlist);
     initGroupsSortable(document.getElementById('groups-container'));
     openDraftIfEmptyOnLoad(playlist);
+    initWebSocket(slug);
   } catch {
     showToast('Failed to load playlist', 'danger');
   }

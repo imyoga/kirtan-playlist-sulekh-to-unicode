@@ -1,6 +1,7 @@
 import config from '../config/index.js';
 import * as playlistService from '../services/playlist.service.js';
 import { renderLandingHtml, renderPlaylistHtml } from '../utils/htmlTemplate.js';
+import { broadcastToPlaylist } from '../ws/server.js';
 
 function getBaseUrl(req) {
   return config.baseUrl || `${req.protocol}://${req.get('host')}`;
@@ -42,6 +43,19 @@ export async function patchPlaylist(req, res) {
   if (!title) return res.status(400).json({ error: 'title is required' });
   const playlist = await playlistService.updatePlaylistTitle(req.params.slug, title);
   if (!playlist) return res.status(404).json({ error: 'Playlist not found' });
+
+  const clientId = req.get('x-client-id') || null;
+  broadcastToPlaylist(
+    req.params.slug,
+    {
+      type: 'playlist:title',
+      title: playlist.title,
+      playlist,
+      senderId: clientId,
+    },
+    clientId
+  );
+
   res.json({ playlist });
 }
 
@@ -57,6 +71,19 @@ export async function addItem(req, res) {
   const groupId = req.body?.groupId ? Number(req.body.groupId) : undefined;
   const result = await playlistService.addItem(req.params.slug, text, groupId);
   if (!result) return res.status(404).json({ error: 'Playlist not found' });
+
+  const clientId = req.get('x-client-id') || null;
+  broadcastToPlaylist(
+    req.params.slug,
+    {
+      type: 'item:add',
+      item: result.item,
+      converted: result.converted,
+      senderId: clientId,
+    },
+    clientId
+  );
+
   res.status(201).json(result);
 }
 
@@ -65,12 +92,42 @@ export async function patchItem(req, res) {
   if (typeof text !== 'string') return res.status(400).json({ error: 'text is required' });
   const item = await playlistService.updateItem(Number(req.params.id), text);
   if (!item) return res.status(404).json({ error: 'Item not found' });
+
+  const clientId = req.get('x-client-id') || null;
+  if (item.slug) {
+    broadcastToPlaylist(
+      item.slug,
+      {
+        type: 'item:update',
+        item,
+        senderId: clientId,
+      },
+      clientId
+    );
+  }
+
   res.json({ item });
 }
 
 export async function deleteItem(req, res) {
-  const ok = await playlistService.removeItem(Number(req.params.id));
+  const itemId = Number(req.params.id);
+  const slug = await playlistService.getPlaylistSlugByItemId(itemId);
+  const ok = await playlistService.removeItem(itemId);
   if (!ok) return res.status(404).json({ error: 'Item not found' });
+
+  const clientId = req.get('x-client-id') || null;
+  if (slug) {
+    broadcastToPlaylist(
+      slug,
+      {
+        type: 'item:delete',
+        itemId,
+        senderId: clientId,
+      },
+      clientId
+    );
+  }
+
   res.status(204).end();
 }
 

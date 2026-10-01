@@ -19,3 +19,7 @@ export async function reorderGroups(slug, groupIds) {
 export async function reorderItemsInGroup(groupId, itemIds) {
   return db.updateItemPositionsInGroup(groupId, itemIds);
 }
+
+export async function getPlaylistSlugByGroupId(groupId) {
+  return db.getPlaylistSlugByGroupId(groupId);
+}

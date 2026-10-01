@@ -11,7 +11,7 @@ import {
 import { showToast } from './toast.js';
 import { confirmDialog } from './confirm-dialog.js';
 
-const itemHooks = {
+export const itemHooks = {
   onTitleChange: (id, title) => updateNavItemTitle(id, title),
   onRemoved: () => rebuildSidebarNav(),
 };

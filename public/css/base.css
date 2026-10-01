@@ -107,6 +107,41 @@ body {
 
 input, textarea, button { font-family: inherit; }
 
+/* Real-time Viewport Sync Indicator */
+.viewport-sync-border {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease-out, visibility 0.15s;
+}
+
+.viewport-sync-border.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.viewport-sync-border rect {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4px;
+  stroke-dasharray: 6 8;
+  stroke-linecap: round;
+  animation: viewportMarchingDots 0.75s linear infinite;
+  filter: drop-shadow(0 0 6px var(--accent-ring));
+}
+
+@keyframes viewportMarchingDots {
+  to {
+    stroke-dashoffset: -28px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

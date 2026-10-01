@@ -39,6 +39,10 @@ export async function removeItem(itemId) {
   return db.deleteItem(itemId);
 }
 
+export async function getPlaylistSlugByItemId(itemId) {
+  return db.getPlaylistSlugByItemId(itemId);
+}
+
 export function convertToSulekh(text) {
   return unicodeToSulekh(text);
 }

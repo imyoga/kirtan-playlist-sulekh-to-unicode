@@ -230,15 +230,40 @@ export async function createGroup(slug, name) {
     `INSERT INTO groups (playlist_id, name, position) VALUES (?, ?, ?) RETURNING id, name, position, created_at, updated_at`,
     [playlistId, name, position]
   );
-  return { ...rows[0], items: [] };
+  return { ...rows[0], items: [], slug };
+}
+
+export async function getPlaylistSlugByGroupId(groupId) {
+  const rows = await query(
+    `SELECT p.slug
+     FROM groups g
+     JOIN playlists p ON p.id = g.playlist_id
+     WHERE g.id = ?`,
+    [groupId]
+  );
+  return rows[0]?.slug ?? null;
+}
+
+export async function getPlaylistSlugByItemId(itemId) {
+  const rows = await query(
+    `SELECT p.slug
+     FROM items i
+     JOIN groups g ON g.id = i.group_id
+     JOIN playlists p ON p.id = g.playlist_id
+     WHERE i.id = ?`,
+    [itemId]
+  );
+  return rows[0]?.slug ?? null;
 }
 
 export async function updateGroupName(groupId, name) {
+  const slug = await getPlaylistSlugByGroupId(groupId);
   const rows = await query(
     `UPDATE groups SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING id, name, position, created_at, updated_at`,
     [name, groupId]
   );
-  return rows[0] || null;
+  if (!rows[0]) return null;
+  return { ...rows[0], slug };
 }
 
 export async function deleteGroup(groupId) {
@@ -296,11 +321,13 @@ export async function getDefaultGroupId(slug) {
 }
 
 export async function updateItemText(itemId, text) {
+  const slug = await getPlaylistSlugByItemId(itemId);
   const rows = await query(
     `UPDATE items SET text = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING id, group_id, text, position, created_at, updated_at`,
     [text, itemId]
   );
-  return rows[0] || null;
+  if (!rows[0]) return null;
+  return { ...rows[0], slug };
 }
 
 export async function deleteItem(itemId) {
@@ -310,7 +337,7 @@ export async function deleteItem(itemId) {
 
 export async function updateItemPositionsInGroup(groupId, itemIds) {
   const group = await getGroupWithPlaylist(groupId);
-  if (!group) return false;
+  if (!group) return null;
 
   for (let i = 0; i < itemIds.length; i++) {
     await query(
@@ -319,5 +346,5 @@ export async function updateItemPositionsInGroup(groupId, itemIds) {
       [i, groupId, itemIds[i], group.playlist_id]
     );
   }
-  return true;
+  return { ok: true, slug: group.playlist_slug };
 }

@@ -1,4 +1,4 @@
-import { getSlug } from './api.js';
+import { getSlug, CLIENT_ID } from './api.js';
 import { showToast } from './toast.js';
 
 let syncing = false;
@@ -125,7 +125,7 @@ export async function persistAllGroupPositions() {
         );
         return fetch(`/api/groups/${groupId}/items/positions`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-client-id': CLIENT_ID },
           body: JSON.stringify({ itemIds }),
         });
       })
@@ -133,7 +133,7 @@ export async function persistAllGroupPositions() {
     const groupIds = [...groupCards].map((g) => Number(g.dataset.groupId));
     await fetch(`/api/playlists/${encodeURIComponent(slug)}/groups/positions`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-client-id': CLIENT_ID },
       body: JSON.stringify({ groupIds }),
     });
   } catch {
