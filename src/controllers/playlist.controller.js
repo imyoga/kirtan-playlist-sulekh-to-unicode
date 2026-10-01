@@ -90,9 +90,10 @@ export async function addItem(req, res) {
 export async function patchItem(req, res) {
   const text = req.body?.text;
   if (typeof text !== 'string') return res.status(400).json({ error: 'text is required' });
-  const item = await playlistService.updateItem(Number(req.params.id), text);
-  if (!item) return res.status(404).json({ error: 'Item not found' });
+  const result = await playlistService.updateItem(Number(req.params.id), text);
+  if (!result) return res.status(404).json({ error: 'Item not found' });
 
+  const { item, converted } = result;
   const clientId = req.get('x-client-id') || null;
   if (item.slug) {
     broadcastToPlaylist(
@@ -100,13 +101,14 @@ export async function patchItem(req, res) {
       {
         type: 'item:update',
         item,
+        converted,
         senderId: clientId,
       },
       clientId
     );
   }
 
-  res.json({ item });
+  res.json({ item, converted });
 }
 
 export async function deleteItem(req, res) {

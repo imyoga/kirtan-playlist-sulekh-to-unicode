@@ -56,7 +56,14 @@ function bindItemCard(li, item, { onRemove, isDraft = false, onConfirmDraft, onT
       clearTimeout(saveTimers.get(item.id));
       const t = setTimeout(async () => {
         try {
-          await updateItem(item.id, textarea.value);
+          const result = await updateItem(item.id, textarea.value);
+          // If the server converted sulekh → unicode, update the textarea
+          // so the displayed text matches what is stored
+          if (result?.converted && result?.item?.text) {
+            textarea.value = result.item.text;
+            scheduleAutoGrow(textarea);
+            refreshTitle();
+          }
         } catch {
           showToast('Failed to save', 'danger');
         }

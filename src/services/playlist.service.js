@@ -32,7 +32,9 @@ export async function addItem(slug, rawText, groupId) {
 }
 
 export async function updateItem(itemId, text) {
-  return db.updateItemText(itemId, text);
+  const { unicode, converted } = preparePlaylistText(text);
+  const item = await db.updateItemText(itemId, unicode);
+  return item ? { item, converted } : null;
 }
 
 export async function removeItem(itemId) {
